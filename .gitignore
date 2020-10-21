@@ -1,3 +1,5 @@
 /.vscode
 clipboardManager.code-workspace
 .venv
+dist
+build
