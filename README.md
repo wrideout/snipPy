@@ -53,9 +53,9 @@ MS Windows and Linux are below.  This is left as an excersise for the user.
 
 An icon for use with standalone binaries created from this project is included in
 this repository, and is available for use via the MIT license.  The icon and others
-in the icon set may be viewed
-[here](https://www.iconfinder.com/icons/2561366/paperclip_icon).  The icon is 512x512
-pixels in size.
+in the icon set were designed by Cole Bemis, and may be viewed
+[here](https://www.iconfinder.com/icons/2561366/paperclip_icon).  The icon provided
+here is 512x512 pixels in size.
 
 ## Basic Usage
 Once run, clipboardManager waits for new text to be copied to the system clipboard.
