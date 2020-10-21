@@ -23,8 +23,8 @@ $ pip3 install pyperclip
 $ pip3 install PyQt5
 ```
 
-Alternatively, you can use `pip` to install all dependencies through the
-`requirements.txt` file.
+Alternatively, the user may use the following command to install all dependencies
+through the `requirements.txt` file.
 
 ```bash
 $ pip3 install -r requirements.txt
@@ -40,16 +40,14 @@ of which is simply invoking the command from the CLI as a background task:
 $ python3 clipboard_mgr_qt.py&
 ```
 
-Alternatively, this project has been packaged via py2app
-(more info [here](https://py2app.readthedocs.io/en/latest/index.html)) to be runnable
-as a standalone application for Apple macOS.  The executable for this application may
-be found in the `dist` directory of this repository, and may be copied to an
-appropriate location by the user.
-
 Although not already completed, instructions for creating standalone executables for
-MS Windows and Linux are below.  This is left as an excersise for the user.
-- MS Windows, via [py2exe](https://pypi.org/project/py2exe/)
-- Linux, via [pyinstaller](https://pypi.org/project/pyinstaller/)
+Apple macOS, MS Windows, and Linux are below.  The creation of such binaries is left
+as an excersise for the user.
+- Apple macOS, via [py2app](https://py2app.readthedocs.io/en/latest/tutorial.html)
+- MS Windows, via [py2exe](https://www.py2exe.org/index.cgi/Tutorial)
+- Linux, via [pyinstaller](https://www.pyinstaller.org/)
+
+py2app, py2exe, and pyinstaller are available for download and installation via pypi.
 
 An icon for use with standalone binaries created from this project is included in
 this repository, and is available for use via the MIT license.  The icon and others
@@ -58,8 +56,8 @@ viewed [here](https://www.iconfinder.com/icons/2561366/paperclip_icon).  The ico
 provided here is 512x512 pixels in size.
 
 ## Basic Usage
-Once run, clipboardManager waits for new text to be copied to the system clipboard.
-Once a text snippet is copied, it is displayed in the main window of
+Once running, clipboardManager waits for new text to be copied to the system
+clipboard.  Once a text snippet is copied, it is displayed in the main window of
 clipboardManager.  Up to 30 snippets may be stored.  Displayed snippets may be
 re-selected for use by simply clicking on an entry.  This causes the selected text
 snippet to be placed at the top of the system clipboard so it may be immediately
