@@ -19,12 +19,12 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import QTimer
 import pyperclip
 
-# In order to preserve the order of the system clipboard, a deque is used.
-# However, in order to prevent long lines of text in the GUI, we truncate
-# all clippings if they are greater in length than MAX_DISPLAY_CHAR_COUNT.  Since
-# the deque can only contain these truncated strings, a dictionary is maintained
-# in order to provide a mapping between such truncated display_text and the
-# actual clipping from the system clipboard.
+# In order to preserve the order of the system clipboard, a deque is used.  However,
+# in order to prevent long lines of text in the GUI, we truncate all clippings if
+# they are greater in length than MAX_DISPLAY_CHAR_COUNT.  Since the deque can only
+# contain these truncated strings, a dictionary is maintained in order to provide a
+# mapping between such truncated display_text and the actual clipping from the system
+# clipboard.
 #
 # CLIPPINGS_MAX_LEN indicates the maximum depth of the deque.
 MAX_DISPLAY_CHAR_COUNT = 60
@@ -52,10 +52,10 @@ class MainWindow( QMainWindow ):
     '''
     Class for the main GUI window.
 
-    This class contains a timer which polls the system cliboard every 200ms
-    looking for new clipboard entries.  If a new entry is found, it is added
-    to the deque and dictionary, and a (sometimes) truncated version of the
-    clipped string is printed in the GUI for use later.
+    This class contains a timer which polls the system cliboard every 200ms looking
+    for new clipboard entries.  If a new entry is found, it is added to the deque and
+    dictionary, and a (sometimes) truncated version of the clipped string is printed
+    in the GUI for use later.
     '''
     def __init__( self, *args, **kwargs ):
         super( MainWindow, self ).__init__( *args, **kwargs )
@@ -81,11 +81,10 @@ class MainWindow( QMainWindow ):
 
     def add_new_clipping( self, clipping, display_text ):
         '''
-        Add the passed clipping into the dictionary mapping of display_text
-        to clippings, and add the display_text to the deque.
+        Add the passed clipping into the dictionary mapping of display_text to 
+        clippings, and add the display_text to the deque.
 
-        Maintain the size of the deque and dictionary based on
-        CLIPPINGS_MAX_LEN.
+        Maintain the size of the deque and dictionary based on CLIPPINGS_MAX_LEN.
 
         Refresh the GUI so that the current contents of the deque are shown.
         '''
