@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+#pylint: disable=invalid-name
+
 '''
 clipboard_mgr_qt.py
 
@@ -81,7 +83,7 @@ class MainWindow( QMainWindow ):
 
     def add_new_clipping( self, clipping, display_text ):
         '''
-        Add the passed clipping into the dictionary mapping of display_text to 
+        Add the passed clipping into the dictionary mapping of display_text to
         clippings, and add the display_text to the deque.
 
         Maintain the size of the deque and dictionary based on CLIPPINGS_MAX_LEN.
