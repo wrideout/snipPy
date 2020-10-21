@@ -60,15 +60,17 @@ class MainWindow( QMainWindow ):
     def __init__( self, *args, **kwargs ):
         super( MainWindow, self ).__init__( *args, **kwargs )
         self.setWindowTitle( 'Clipboard' )
+        self.setFixedWidth( 400 )
         self.clippings_widget = ClippingsListWidget()
         self.clippings_widget.setFixedWidth( 400 )
-        self.clippings_widget.setFixedHeight( 800 )
+        #self.clippings_widget.setFixedHeight( 800 )
         for _ in range( CLIPPINGS_MAX_LEN ):
             self.clippings_widget.addItem( '' )
         self.clippings_widget.itemClicked.connect( self.clippings_widget.Clicked )
         self.clippings_widget.setSpacing( 4 )
         self.clippings_widget.setWordWrap( False )
         self.setCentralWidget( self.clippings_widget )
+        self.resize( 400, 500 )
 
         self.timer = QTimer()
         self.timer.setInterval( 200 )
