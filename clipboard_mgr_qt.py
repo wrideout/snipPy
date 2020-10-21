@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''
-clipbaord_mgr_qt
+clipboard_mgr_qt.py
 
-A simple clipbaord manager leveraging pyQt5.
+A simple clipboard manager leveraging pyQt5.
 
 Will Rideout
 william.rideout@gmail.com
