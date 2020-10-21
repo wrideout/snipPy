@@ -20,7 +20,8 @@ $ pip3 install pyperclip
 $ pip3 install PyQt5
 ```
 
-Alternatively, you can use `pip` to install the requirements through `requirements.txt`
+Alternatively, you can use `pip` to install all dependencies through the `requirements.txt` file.
+
 ```bash
 $ pip install -r requirements.txt
 ```
