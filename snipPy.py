@@ -21,9 +21,10 @@ from PyQt5.QtWidgets import (
     QSystemTrayIcon,
     QMenu,
     QAction,
+    qApp,
 )
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, pyqtSlot
 import pyperclip
 
 # In order to preserve the order of the system clipboard, a deque is used.  However,
@@ -88,7 +89,14 @@ class MainWindow( QMainWindow ):
         self.timer.timeout.connect( self.update_clippings )
         self.timer.start()
 
+        qApp.focusChanged.connect( self.focus_changed )
+
         self.show()
+
+    @pyqtSlot("QWidget*", "QWidget*")
+    def focus_changed( self, old, now ):
+        if now is None:
+            self.hide()
 
     def show_or_hide( self ):
         '''
