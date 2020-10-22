@@ -16,14 +16,14 @@ import sys
 from PyQt5.QtWidgets import (
     QApplication,
     QListWidget,
+    QListWidgetItem,
     QMainWindow,
     QSystemTrayIcon,
     QMenu,
     QAction,
-    qApp
 )
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import QTimer
 import pyperclip
 
 # In order to preserve the order of the system clipboard, a deque is used.  However,
@@ -34,7 +34,7 @@ import pyperclip
 # clipboard.
 #
 # CLIPPINGS_MAX_LEN indicates the maximum depth of the deque.
-MAX_DISPLAY_CHAR_COUNT = 60
+MAX_DISPLAY_CHAR_COUNT = 55
 CLIPPINGS_MAX_LEN = 30
 clippings = deque()
 fullClippings = {}
@@ -53,6 +53,9 @@ class ClippingsListWidget( QListWidget ):
         '''
         if str( item.text() ):
             val = fullClippings[ str( item.text() ) ]
+            clippings.remove( str( item.text() ) )
+            # The newly re-copied clipping will be re-added to the list (at the top)
+            # the QTimer task of MainWindow.
             pyperclip.copy( val )
 
 class MainWindow( QMainWindow ):
@@ -67,7 +70,6 @@ class MainWindow( QMainWindow ):
     def __init__( self, *args, **kwargs ):
         super( MainWindow, self ).__init__( *args, **kwargs )
         self.setWindowTitle( 'Clipboard' )
-        self.setWindowIcon( QIcon( 'images/icon.png' ) )
         self.setFixedWidth( 400 )
         self.clippings_widget = ClippingsListWidget()
         self.clippings_widget.setFixedWidth( 400 )
@@ -99,6 +101,20 @@ class MainWindow( QMainWindow ):
         else:
             self.hide()
 
+    def create_clipping_widgets( self ):
+        '''
+        Populate the list of clippings.  The first clipping is also the current
+        contents of the system clipboard, and are so indicated by a checkmark icon.
+        All other clippings simply have a dash to visually itemize them.
+        '''
+        for i, clip in enumerate( clippings ):
+            widget = QListWidgetItem( self.clippings_widget )
+            widget.setText( clip )
+            if not i:
+                widget.setIcon( QIcon( 'images/firstClipping.png' ) )
+            else:
+                widget.setIcon( QIcon( 'images/clipping.png' ) )
+
     def add_new_clipping( self, clipping, display_text ):
         '''
         Add the passed clipping into the dictionary mapping of display_text to
@@ -115,7 +131,7 @@ class MainWindow( QMainWindow ):
         clippings.appendleft( display_text )
         fullClippings[ display_text ] = clipping
         self.clippings_widget.clear()
-        self.clippings_widget.addItems( clippings )
+        self.create_clipping_widgets()
 
     def update_clippings( self ):
         '''
