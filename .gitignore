@@ -3,3 +3,4 @@ snipPy.code-workspace
 .venv
 dist
 build
+setup.py

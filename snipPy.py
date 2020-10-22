@@ -67,7 +67,7 @@ class MainWindow( QMainWindow ):
     def __init__( self, *args, **kwargs ):
         super( MainWindow, self ).__init__( *args, **kwargs )
         self.setWindowTitle( 'Clipboard' )
-        self.setWindowIcon( QIcon( 'icon.png' ) )
+        self.setWindowIcon( QIcon( 'images/icon.png' ) )
         self.setFixedWidth( 400 )
         self.clippings_widget = ClippingsListWidget()
         self.clippings_widget.setFixedWidth( 400 )
@@ -138,7 +138,7 @@ app.setQuitOnLastWindowClosed(False)
 
 window = MainWindow()
 system_tray = QSystemTrayIcon()
-system_tray.setIcon( QIcon( 'trayIcon.png' ) )
+system_tray.setIcon( QIcon( 'images/trayIcon.png' ) )
 system_tray.setVisible( True )
 
 menu = QMenu()

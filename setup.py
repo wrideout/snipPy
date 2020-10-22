@@ -7,8 +7,8 @@ Usage:
 
 from setuptools import setup
 
-APP = ['clipboard_mgr_qt.py']
-DATA_FILES = []
+APP = ['snipPy.py']
+DATA_FILES = ['--iconfile', 'images/icon.png']
 OPTIONS = {}
 
 setup(
