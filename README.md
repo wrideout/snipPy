@@ -63,8 +63,6 @@ re-selected for use by simply clicking on an entry.  This causes the selected te
 snippet to be placed at the top of the system clipboard so it may be immediately
 used.
 
-Note that this application exits if the main window of snipPy is closed.
-
 ## License
 This software is available for free use via the terms of the GNU General Public
 License (GPL).  See LICENSE for more details.

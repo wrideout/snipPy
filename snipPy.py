@@ -17,8 +17,13 @@ from PyQt5.QtWidgets import (
     QApplication,
     QListWidget,
     QMainWindow,
+    QSystemTrayIcon,
+    QMenu,
+    QAction,
+    qApp
 )
-from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QTimer, Qt
 import pyperclip
 
 # In order to preserve the order of the system clipboard, a deque is used.  However,
@@ -62,12 +67,14 @@ class MainWindow( QMainWindow ):
     def __init__( self, *args, **kwargs ):
         super( MainWindow, self ).__init__( *args, **kwargs )
         self.setWindowTitle( 'Clipboard' )
+        self.setWindowIcon( QIcon( 'icon.png' ) )
         self.setFixedWidth( 400 )
         self.clippings_widget = ClippingsListWidget()
         self.clippings_widget.setFixedWidth( 400 )
-        #self.clippings_widget.setFixedHeight( 800 )
+
         for _ in range( CLIPPINGS_MAX_LEN ):
             self.clippings_widget.addItem( '' )
+
         self.clippings_widget.itemClicked.connect( self.clippings_widget.Clicked )
         self.clippings_widget.setSpacing( 4 )
         self.clippings_widget.setWordWrap( False )
@@ -80,6 +87,17 @@ class MainWindow( QMainWindow ):
         self.timer.start()
 
         self.show()
+
+    def show_or_hide( self ):
+        '''
+        Hide or show the main window, based on the value of self.visible.  This is
+        essentially just a toggle.
+        '''
+        if not self.isVisible():
+            self.show()
+            self.raise_()
+        else:
+            self.hide()
 
     def add_new_clipping( self, clipping, display_text ):
         '''
@@ -114,7 +132,28 @@ class MainWindow( QMainWindow ):
         if display_text not in clippings:
             self.add_new_clipping( new_paste, display_text )
 
-if __name__ == '__main__':
-    app = QApplication( sys.argv )
-    window = MainWindow()
-    sys.exit( app.exec_() )
+
+app = QApplication( sys.argv )
+app.setQuitOnLastWindowClosed(False)
+
+window = MainWindow()
+system_tray = QSystemTrayIcon()
+system_tray.setIcon( QIcon( 'trayIcon.png' ) )
+system_tray.setVisible( True )
+
+menu = QMenu()
+
+show_hide_action = QAction( 'Toggle Clipboard' )
+show_hide_action.triggered.connect( window.show_or_hide )
+menu.addAction( show_hide_action )
+
+menu.addSeparator()
+
+quit_action = QAction( 'Quit' )
+quit_action.triggered.connect( app.quit )
+menu.addAction( quit_action )
+
+system_tray.setContextMenu( menu )
+
+app.exec_()
+sys.exit()
