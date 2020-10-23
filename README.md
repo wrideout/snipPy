@@ -1,7 +1,7 @@
 # snipPy
 
 ## Summary
-snipPy is a lightweight utility for making the last 30 entries of the
+snipPy is a lightweight system tray utility for making the last 30 entries of the
 system clipboard available for re-use in a simple UI.  snipPy does not
 support networking of any kind, and the contents of the system clipboard are not
 saved outside the host device.  The contents of snipPy are recorded
