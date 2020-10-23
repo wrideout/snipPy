@@ -71,7 +71,7 @@ class SystemTray( QSystemTrayIcon ):
 
         self.show()
 
-    def create_clipping_widgets( self ):
+    def update_context_menu( self ):
         '''
         Populate the list of clippings.  The first clipping is also the current
         contents of the system clipboard, and are so indicated by a checkmark icon.
@@ -114,7 +114,7 @@ class SystemTray( QSystemTrayIcon ):
         self.full_clippings[ display_text ] = clipping
         self.menu.clear()
         self.actions.clear()
-        self.create_clipping_widgets()
+        self.update_context_menu()
 
     def update_clippings( self ):
         '''
