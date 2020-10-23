@@ -108,8 +108,8 @@ class SystemTray( QSystemTrayIcon ):
         '''
         if len( self.clippings ) == CLIPPINGS_MAX_LEN:
             key = self.clippings.pop()
-            if key in self._c:
-                del self._c[ key ]
+            if key in self.full_clippings:
+                del self.full_clippings[ key ]
         self.clippings.appendleft( display_text )
         self.full_clippings[ display_text ] = clipping
         self.menu.clear()
@@ -137,7 +137,7 @@ class SystemTray( QSystemTrayIcon ):
         clipboard, and remove it from the clippings.  The newly re-copied clipping
         will be re-added to the list (at the top) the QTimer task of this class.
         '''
-        val = self._c[ display_text ]
+        val = self.full_clippings[ display_text ]
         self.clippings.remove( display_text )
         pyperclip.copy( val )
 
@@ -149,4 +149,3 @@ if __name__ == '__main__':
     system_tray.setContextMenu( system_tray.menu )
 
     app.exec_()
-    sys.exit()
