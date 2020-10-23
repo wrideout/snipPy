@@ -15,113 +15,86 @@ from collections import deque
 import sys
 from PyQt5.QtWidgets import (
     QApplication,
-    QListWidget,
-    QListWidgetItem,
-    QMainWindow,
     QSystemTrayIcon,
     QMenu,
     QAction,
-    qApp,
 )
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QTimer, pyqtSlot
+from PyQt5.QtCore import QTimer
 import pyperclip
 
-# In order to preserve the order of the system clipboard, a deque is used.  However,
-# in order to prevent long lines of text in the GUI, we truncate all clippings if
-# they are greater in length than MAX_DISPLAY_CHAR_COUNT.  Since the deque can only
-# contain these truncated strings, a dictionary is maintained in order to provide a
-# mapping between such truncated display_text and the actual clipping from the system
-# clipboard.
-#
-# CLIPPINGS_MAX_LEN indicates the maximum depth of the deque.
-MAX_DISPLAY_CHAR_COUNT = 55
+MAX_DISPLAY_CHAR_COUNT = 30
 CLIPPINGS_MAX_LEN = 30
-clippings = deque()
-fullClippings = {}
 
-class ClippingsListWidget( QListWidget ):
+class SystemTray( QSystemTrayIcon ):
     '''
-    Class for reacting to GUI keyclicks on entries in the QListWidget.
-
-    The item text which is clicked is used as the key for lookup into the master
-    dictionary of display_test to clippings.
-    '''
-    #pylint: disable=invalid-name
-    def Clicked( self, item ):
-        '''
-        React to clicks on entries in the QListWidget.
-        '''
-        if str( item.text() ):
-            val = fullClippings[ str( item.text() ) ]
-            clippings.remove( str( item.text() ) )
-            # The newly re-copied clipping will be re-added to the list (at the top)
-            # the QTimer task of MainWindow.
-            pyperclip.copy( val )
-
-class MainWindow( QMainWindow ):
-    '''
-    Class for the main GUI window.
+    Class for the main GUI.  snipPy lives in the system tray, and populates a context
+    menu based on the last CLIPPINGS_MAX_LEN enties copied to the system clipboard.
 
     This class contains a timer which polls the system cliboard every 200ms looking
     for new clipboard entries.  If a new entry is found, it is added to the deque and
     dictionary, and a (sometimes) truncated version of the clipped string is printed
     in the GUI for use later.
+
+    In order to preserve the order of the system clipboard, a deque is used.
+    However, in order to prevent long lines of text in the GUI, we truncate all
+    clippings if they are greater in length than MAX_DISPLAY_CHAR_COUNT.  Since the
+    deque can only contain these truncated strings, a dictionary is maintained in
+    order to provide a mapping between such truncated display_text and the actual
+    clipping from the system clipboard.
+
+    CLIPPINGS_MAX_LEN indicates the maximum depth of the deque.
     '''
-    def __init__( self, *args, **kwargs ):
-        super( MainWindow, self ).__init__( *args, **kwargs )
-        self.setWindowTitle( 'Clipboard' )
-        self.setFixedWidth( 400 )
-        self.clippings_widget = ClippingsListWidget()
-        self.clippings_widget.setFixedWidth( 400 )
+    def __init__( self, parent_app, *args, **kwargs ):
+        super( SystemTray, self ).__init__( *args, **kwargs )
 
-        for _ in range( CLIPPINGS_MAX_LEN ):
-            self.clippings_widget.addItem( '' )
+        self.clippings = deque()
+        self.full_clippings = {}
 
-        self.clippings_widget.itemClicked.connect( self.clippings_widget.Clicked )
-        self.clippings_widget.setSpacing( 4 )
-        self.clippings_widget.setWordWrap( False )
-        self.setCentralWidget( self.clippings_widget )
-        self.resize( 400, 500 )
+        self.app = parent_app
+        self.setIcon( QIcon( 'images/trayIcon.png' ) )
+        self.setVisible( True )
+
+        self.actions = []
+
+        # Initial menu contents
+        self.menu = QMenu()
+        self.menu.addSeparator()
+        quit_action = QAction( 'Quit' )
+        quit_action.triggered.connect( app.quit )
+        self.menu.addAction( quit_action )
 
         self.timer = QTimer()
         self.timer.setInterval( 200 )
         self.timer.timeout.connect( self.update_clippings )
         self.timer.start()
 
-        qApp.focusChanged.connect( self.focus_changed )
-
         self.show()
 
-    @pyqtSlot("QWidget*", "QWidget*")
-    def focus_changed( self, old, now ):
-        if now is None:
-            self.hide()
-
-    def show_or_hide( self ):
-        '''
-        Hide or show the main window, based on the value of self.visible.  This is
-        essentially just a toggle.
-        '''
-        if not self.isVisible():
-            self.show()
-            self.raise_()
-        else:
-            self.hide()
-
-    def create_clipping_widgets( self ):
+    def update_context_menu( self ):
         '''
         Populate the list of clippings.  The first clipping is also the current
         contents of the system clipboard, and are so indicated by a checkmark icon.
         All other clippings simply have a dash to visually itemize them.
         '''
-        for i, clip in enumerate( clippings ):
-            widget = QListWidgetItem( self.clippings_widget )
-            widget.setText( clip )
+        for i, clip in enumerate( self.clippings ):
+            action = QAction( clip )
             if not i:
-                widget.setIcon( QIcon( 'images/firstClipping.png' ) )
+                action.setIcon( QIcon( 'images/firstClipping.png' ) )
             else:
-                widget.setIcon( QIcon( 'images/clipping.png' ) )
+                action.setIcon( QIcon( 'images/clipping.png' ) )
+            action.triggered.connect( lambda checked, clip=clip:
+                    self.recopy( clip ) )
+            self.actions.append( action )
+
+        # Always append static menu items, after a separator.
+        separator = QAction()
+        separator.setSeparator( True )
+        self.actions.append( separator )
+        quit_action = QAction( 'Quit' )
+        quit_action.triggered.connect( self.app.quit )
+        self.actions.append( quit_action )
+        self.menu.addActions( self.actions )
 
     def add_new_clipping( self, clipping, display_text ):
         '''
@@ -130,16 +103,18 @@ class MainWindow( QMainWindow ):
 
         Maintain the size of the deque and dictionary based on CLIPPINGS_MAX_LEN.
 
-        Refresh the GUI so that the current contents of the deque are shown.
+        Refresh the GUI so that the current contents of the deque are shown in the
+        context menu.
         '''
-        if len( clippings ) == CLIPPINGS_MAX_LEN:
-            key = clippings.pop()
-            if key in fullClippings:
-                del fullClippings[ key ]
-        clippings.appendleft( display_text )
-        fullClippings[ display_text ] = clipping
-        self.clippings_widget.clear()
-        self.create_clipping_widgets()
+        if len( self.clippings ) == CLIPPINGS_MAX_LEN:
+            key = self.clippings.pop()
+            if key in self._c:
+                del self._c[ key ]
+        self.clippings.appendleft( display_text )
+        self.full_clippings[ display_text ] = clipping
+        self.menu.clear()
+        self.actions.clear()
+        self.update_context_menu()
 
     def update_clippings( self ):
         '''
@@ -153,31 +128,25 @@ class MainWindow( QMainWindow ):
             display_text = new_paste.split( '\n' )[ 0 ].rstrip() + '...'
         if len( display_text ) >= MAX_DISPLAY_CHAR_COUNT:
             display_text = display_text[ 0:MAX_DISPLAY_CHAR_COUNT ].rstrip() + '...'
-        if display_text not in clippings:
+        if display_text not in self.clippings:
             self.add_new_clipping( new_paste, display_text )
 
+    def recopy( self, display_text ):
+        '''
+        Re-insert the full clipping indexed by the passed display_test to the system
+        clipboard, and remove it from the clippings.  The newly re-copied clipping
+        will be re-added to the list (at the top) the QTimer task of this class.
+        '''
+        val = self._c[ display_text ]
+        self.clippings.remove( display_text )
+        pyperclip.copy( val )
 
-app = QApplication( sys.argv )
-app.setQuitOnLastWindowClosed(False)
+if __name__ == '__main__':
+    app = QApplication( sys.argv )
+    app.setQuitOnLastWindowClosed(False)
 
-window = MainWindow()
-system_tray = QSystemTrayIcon()
-system_tray.setIcon( QIcon( 'images/trayIcon.png' ) )
-system_tray.setVisible( True )
+    system_tray = SystemTray( app )
+    system_tray.setContextMenu( system_tray.menu )
 
-menu = QMenu()
-
-show_hide_action = QAction( 'Toggle Clipboard' )
-show_hide_action.triggered.connect( window.show_or_hide )
-menu.addAction( show_hide_action )
-
-menu.addSeparator()
-
-quit_action = QAction( 'Quit' )
-quit_action.triggered.connect( app.quit )
-menu.addAction( quit_action )
-
-system_tray.setContextMenu( menu )
-
-app.exec_()
-sys.exit()
+    app.exec_()
+    sys.exit()
