@@ -16,7 +16,8 @@ support and access to the system clipboard:
 - [PyQt5 v5.15.1](https://pypi.org/project/PyQt5/)
 
 The both pyperclip and PyQt5 are available within the libraries of PyPi, and may be
-installed via the `pip3` command.
+installed via the `pip3` command.  It is recommended that all all `pip3` commands are
+run from within a virtual environment.
 
 ```bash
 $ pip3 install pyperclip
@@ -37,7 +38,7 @@ Running snipPy may be accomplished several different ways, the most basic
 of which is simply invoking the command from the CLI as a background task:
 
 ```bash
-$ python3 clipboard_mgr_qt.py&
+$ python3 snipPy.py&
 ```
 
 Although not already completed, instructions for creating standalone executables for
@@ -52,16 +53,16 @@ py2app, py2exe, and pyinstaller are available for download and installation via 
 An icon for use with standalone binaries created from this project is included in
 this repository, and is available for use via the MIT license.  The icon and others
 in the icon set were designed by [Cole Bemis](https://colebemis.com/), and may be
-viewed [here](https://www.iconfinder.com/icons/2561366/paperclip_icon).  The icon
-provided here is 512x512 pixels in size.
+viewed [here](https://www.iconfinder.com/icons/2561366/paperclip_icon).
 
 ## Basic Usage
 Once running, snipPy waits for new text to be copied to the system
-clipboard.  Once a text snippet is copied, it is displayed in the main window of
-snipPy.  Up to 30 snippets may be stored.  Displayed snippets may be
+clipboard.  Once a text snippet is copied, it is displayed in the context menu of the
+snipPy system tray icon.  Up to 30 snippets may be stored.  Displayed snippets may be
 re-selected for use by simply clicking on an entry.  This causes the selected text
 snippet to be placed at the top of the system clipboard so it may be immediately
-used.
+used.  The current contents of the system clipboard are indicated in the context menu
+of snipPy are indicated by a checkmark icon.
 
 ## License
 This software is available for free use via the terms of the GNU General Public
