@@ -128,8 +128,11 @@ class SystemTray( QSystemTrayIcon ):
             display_text = new_paste.split( '\n' )[ 0 ].rstrip() + '...'
         if len( display_text ) >= MAX_DISPLAY_CHAR_COUNT:
             display_text = display_text[ 0:MAX_DISPLAY_CHAR_COUNT ].rstrip() + '...'
-        if display_text not in self.clippings:
-            self.add_new_clipping( new_paste, display_text )
+        if display_text in self.clippings:
+            # remove the previous entry to trigger move to top
+            self.clippings.remove( display_text )
+            del self.full_clippings[ display_text ]
+        self.add_new_clipping( new_paste, display_text )
 
     def recopy( self, display_text ):
         '''
